@@ -16,7 +16,7 @@
 package overlock.threadpool
 
 import java.util.concurrent._
-import com.yammer.metrics._
+//import com.yammer.metrics._
 import scala._
 import org.slf4j.LoggerFactory
 
@@ -28,20 +28,19 @@ class InstrumentedThreadPoolExecutor(path : String,
     unit : TimeUnit,
     workQueue : BlockingQueue[Runnable],
     factory : ThreadFactory) extends 
-    ThreadPoolExecutor(corePoolSize,maximumPoolSize,keepAliveTime,unit,workQueue,factory) with 
-    Instrumented {
+    ThreadPoolExecutor(corePoolSize,maximumPoolSize,keepAliveTime,unit,workQueue,factory){
   protected lazy val log = LoggerFactory.getLogger(getClass)
-  val requestRate = metrics.meter("request", "requests", path + "." + name, TimeUnit.SECONDS)
-  val rejectedRate = metrics.meter("rejected", "requests", path + "." + name, TimeUnit.SECONDS)
-  val executionTimer = metrics.timer("execution", path + "." + name)
-  val queueGauge = metrics.gauge("queue size", path + "." + name)(getQueue.size)
-  val threadGauge = metrics.gauge("threads", path + "." + name)(getPoolSize)
-  val activeThreadGauge = metrics.gauge("active threads", path + "." + name)(getActiveCount)
+  //val requestRate = metrics.meter("request", "requests", path + "." + name, TimeUnit.SECONDS)
+  //val rejectedRate = metrics.meter("rejected", "requests", path + "." + name, TimeUnit.SECONDS)
+  //val executionTimer = metrics.timer("execution", path + "." + name)
+  //val queueGauge = metrics.gauge("queue size", path + "." + name)(getQueue.size)
+  //val threadGauge = metrics.gauge("threads", path + "." + name)(getPoolSize)
+  //val activeThreadGauge = metrics.gauge("active threads", path + "." + name)(getActiveCount)
   val startTime = new ThreadLocal[Long]
   
   setRejectedExecutionHandler(new RejectedExecutionHandler {
     def rejectedExecution(r : Runnable, executor : ThreadPoolExecutor) {
-      rejectedRate.mark
+      //rejectedRate.mark
       if (!workQueue.offer(r)) {
         log.warn("Work queue is not accepting work.")
       }
@@ -49,16 +48,16 @@ class InstrumentedThreadPoolExecutor(path : String,
   })
   
   override def execute(r : Runnable) {
-    requestRate.mark
+    //requestRate.mark
     super.execute(r)
   }
   
   override protected def beforeExecute(t : Thread, r : Runnable) {
-    startTime.set(System.nanoTime)
+    //startTime.set(System.nanoTime)
   }
   
   override protected def afterExecute(r : Runnable, t : Throwable) {
-    val duration = System.nanoTime - startTime.get
-    executionTimer.update(duration, TimeUnit.NANOSECONDS)
+    //val duration = System.nanoTime - startTime.get
+    //executionTimer.update(duration, TimeUnit.NANOSECONDS)
   }
 }

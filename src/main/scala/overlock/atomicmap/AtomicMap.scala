@@ -16,7 +16,7 @@
 
 package overlock.atomicmap
 
-import scala.collection.mutable.ConcurrentMap
+import scala.collection.concurrent.Map
 import java.util.concurrent.{ConcurrentMap => JConcurrentMap, ConcurrentSkipListMap, ConcurrentHashMap}
 import java.util.Comparator
 import org.cliffc.high_scale_lib._
@@ -55,7 +55,7 @@ object AtomicMap {
   }
 }
 
-class AtomicMap[A,B](u : => JConcurrentMap[A,Any]) extends ConcurrentMap[A,B] {
+class AtomicMap[A,B](u : => JConcurrentMap[A,Any]) extends Map[A,B] {
   val under = u
 
   override def empty = new AtomicMap[A,B](u)
@@ -90,7 +90,7 @@ class AtomicMap[A,B](u : => JConcurrentMap[A,Any]) extends ConcurrentMap[A,B] {
   }
   
   /**
-   * This works because ConcurrentMap defines it as .equals
+   * This works because Map defines it as .equals
    */
   def replace(key : A, oldVal : B, newVal : B) : Boolean = {
     val oldThunk = new OneShotThunk(oldVal)
